@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, silhouette_score
+from sklearn.cluster import KMeans
 from sklearn.model_selection import GridSearchCV
 import joblib
 
@@ -133,6 +134,23 @@ y_pred = mlp.predict(X_test_scaled)
 r2 = r2_score(y_test, y_pred)
 print(f"   -> R2 Score: {r2:.4f}")
 
+print("-" * 50)
+print(f"5. [IA] Análisis Final de Métricas (Post-Entrenamiento)...")
+
+# 1. Clustering Final (sobre datos de entrenamiento para ver estructura aprendida/existente)
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+clusters = kmeans.fit_predict(X_train_scaled)
+sil_score = silhouette_score(X_train_scaled, clusters)
+print(f"   -> Clustering Final (Silhouette Score): {sil_score:.4f}")
+
+# 2. Métricas del Modelo Final
+mse_final = mean_squared_error(y_test, y_pred)
+print(f"   -> Error Final (MSE): {mse_final:.4f}")
+print(f"   -> Precisión Final (R2): {r2:.4f}")
+print(f"   -> Convergencia Final (Loss): {mlp.loss_:.4f}")
+print(f"   -> Iteraciones Totales: {mlp.n_iter_}")
+print("-" * 50)
+
 joblib.dump(mlp, 'modelo_mlp.pkl')
 joblib.dump(scaler, 'scaler.pkl')
-print("4. [Sistema] Archivos actualizados.")
+print("6. [Sistema] Archivos actualizados.")
